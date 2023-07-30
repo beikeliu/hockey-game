@@ -39,20 +39,34 @@ function drawCake(pos, rad, color) {
   ctx.fill()
 }
 
-drawCake(player.position, player.radius, player.color)
-drawCake(right.position, right.radius, right.color)
-drawCake(ball.position, ball.radius, ball.color)
+function draw() {
+  drawCake(player.position, player.radius, player.color)
+  drawCake(right.position, right.radius, right.color)
+  drawCake(ball.position, ball.radius, ball.color)
+}
+
 
 let touched = undefined
+
+function getCakeBox(x, y, r) {
+  return {
+    l: x - r,
+    r: x + r,
+    t: y - r,
+    b: y + r
+  }
+}
 
 function checkTouchPalyer(e) {
   const x = e.touches[0].clientX
   const y = e.touches[0].clientY
   const [px, py] = player.position
-  const l = px - player.radius
-  const r = px + player.radius
-  const t = py - player.radius
-  const b = py + player.radius
+  const {
+    l,
+    r,
+    t,
+    b
+  } = getCakeBox(px, py, player.radius)
   return x >= l && x <= r && y >= t && y <= b
 }
 
@@ -60,10 +74,12 @@ function checkTouchRight(e) {
   const x = e.touches[0].clientX
   const y = e.touches[0].clientY
   const [px, py] = right.position
-  const l = px - right.radius
-  const r = px + right.radius
-  const t = py - right.radius
-  const b = py + right.radius
+  const {
+    l,
+    r,
+    t,
+    b
+  } = getCakeBox(px, py, right.radius)
   return x >= l && x <= r && y >= t && y <= b
 }
 
@@ -76,27 +92,42 @@ function handleTouchMove(e) {
   if (touched === 'right') {
     right.setPosition([x, y])
   }
+  const ballBox = getCakeBox(...ball.position, ball.radius)
+  const playBox = getCakeBox(...player.position, player.radius)
+  if (
+    ballBox.b > playBox.t &&
+    ballBox.t < playBox.b &&
+    ballBox.r > playBox.l &&
+    ballBox.l < playBox.r
+  ) {
+    console.log('碰上了,但是怎么设置ball的弹射方向？')
+  }
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-  drawCake(player.position, player.radius, player.color)
-  drawCake(right.position, right.radius, right.color)
-  drawCake(ball.position, ball.radius, ball.color)
+  draw()
 }
 
-canvas.addEventListener('touchstart', (e) => {
-  if (checkTouchPalyer(e)) {
-    touched = 'player'
-  } else if (checkTouchRight(e)) {
-    touched = 'right'
-  } else {
-    touched = undefined
-  }
-})
+function initEvent() {
+  canvas.addEventListener('touchstart', (e) => {
+    if (checkTouchPalyer(e)) {
+      touched = 'player'
+    } else if (checkTouchRight(e)) {
+      touched = 'right'
+    } else {
+      touched = undefined
+    }
+  })
 
-canvas.addEventListener('touchmove', (e) => {
-  if (!touched) return
-  handleTouchMove(e)
-})
+  canvas.addEventListener('touchmove', (e) => {
+    if (!touched) return
+    handleTouchMove(e)
+  })
 
-canvas.addEventListener('touchend', () => {
-  touched = false
-})
+  canvas.addEventListener('touchend', () => {
+    touched = false
+  })
+}
+
+
+// start
+draw()
+initEvent()
