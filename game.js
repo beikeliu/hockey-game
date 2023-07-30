@@ -2,6 +2,8 @@ import './libs/weapp-adapter'
 
 const ctx = canvas.getContext('2d')
 
+const topBuffer = 50
+
 const player = {
   position: [innerWidth / 2, innerHeight - 60],
   radius: 33,
@@ -13,7 +15,7 @@ const player = {
 }
 
 const right = {
-  position: [innerWidth / 2, 60],
+  position: [innerWidth / 2, 60 + topBuffer],
   radius: 33,
   color: '#0000FF',
   setPosition(position) {
@@ -23,7 +25,7 @@ const right = {
 }
 
 const ball = {
-  position: [innerWidth / 2, innerHeight / 2],
+  position: [innerWidth / 2, innerHeight / 2 + topBuffer / 2],
   radius: 25,
   color: '#FFFFFF',
   setPosition(position) {
@@ -39,7 +41,20 @@ function drawCake(pos, rad, color) {
   ctx.fill()
 }
 
+function drawSite() {
+  ctx.strokeStyle = 'green'
+  ctx.strokeRect(20, 20 + topBuffer, innerWidth - 40, innerHeight - 40 - topBuffer)
+  ctx.strokeStyle = 'black'
+  ctx.beginPath()
+  ctx.moveTo(innerWidth / 2 - 60, 20 + topBuffer)
+  ctx.lineTo(innerWidth / 2 + 60, 20 + topBuffer)
+  ctx.moveTo(innerWidth / 2 - 60, innerHeight - 20)
+  ctx.lineTo(innerWidth / 2 + 60, innerHeight - 20)
+  ctx.stroke();
+}
+
 function draw() {
+  drawSite()
   drawCake(player.position, player.radius, player.color)
   drawCake(right.position, right.radius, right.color)
   drawCake(ball.position, ball.radius, ball.color)
